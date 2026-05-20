@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 30
     sendgrid_api_key: str = ""
     email_from: str = "noreply@mangawatch.app"
+    poll_interval_mangadex: int = 1800  # seconds — 30 min per ADR-0001
+    poll_interval_scrape: int = 7200    # seconds — 2 hr for scrape sources
 
 
 settings = Settings()

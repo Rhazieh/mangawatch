@@ -12,6 +12,10 @@ class Series(Base):
     source_url = Column(String, unique=True, nullable=False, index=True)
     source_type = Column(String, nullable=False)
     external_id = Column(String, nullable=False)
+    last_chapter_id = Column(String, nullable=True)
+    last_chapter_title = Column(String, nullable=True)
+    last_chapter_url = Column(String, nullable=True)
+    last_polled_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 
