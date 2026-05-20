@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     discord_webhook_url: str = ""
     poll_interval_mangadex: int = 1800  # seconds — 30 min per ADR-0001
     poll_interval_scrape: int = 7200    # seconds — 2 hr for scrape sources
+    poll_secret: str = ""               # shared secret for POST /internal/poll
 
     @field_validator("database_url")
     @classmethod

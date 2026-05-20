@@ -8,6 +8,13 @@ from app.models.series import Series, Subscription
 from app.services import discord, sources
 
 
+def poll_all(db: Session) -> dict[str, int]:
+    """Poll every tracked series. Returns a summary of the run."""
+    series_list = db.query(Series).all()
+    new = sum(1 for series in series_list if poll_series(series, db))
+    return {"series_checked": len(series_list), "new_chapters": new}
+
+
 def poll_series(series: Series, db: Session) -> bool:
     """Poll one Series for a new chapter. Returns True if a new chapter was found."""
     latest = sources.get_latest_chapter(series.source_url, series.source_type)
