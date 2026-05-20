@@ -4,9 +4,15 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - APP_ENV=development
+      - APP_ENV=production
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:8000}
       - DATABASE_URL=postgresql://mangawatch:mangawatch@db:5432/mangawatch
       - JWT_SECRET=${JWT_SECRET}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - EMAIL_FROM=${EMAIL_FROM:-noreply@mangawatch.app}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
+      - POLL_INTERVAL_MANGADEX=${POLL_INTERVAL_MANGADEX:-1800}
+      - POLL_INTERVAL_SCRAPE=${POLL_INTERVAL_SCRAPE:-7200}
     depends_on:
       db:
         condition: service_healthy

@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_password_reset_email(to_email: str, reset_token: str) -> None:
-    reset_url = f"http://localhost:8000/auth/reset-password?token={reset_token}"
+    reset_url = f"{settings.app_base_url}/auth/reset-password?token={reset_token}"
 
     if not settings.sendgrid_api_key:
         # In development, log the link instead of sending — check your server logs

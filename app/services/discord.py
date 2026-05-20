@@ -1,8 +1,8 @@
-import os
-
 import httpx
 
-_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK_URL", "")
+from app.config import settings
+
+_WEBHOOK_URL: str = settings.discord_webhook_url
 
 
 def send_alert(message: str) -> None:
