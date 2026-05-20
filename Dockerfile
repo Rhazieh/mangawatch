@@ -7,6 +7,7 @@ FROM python:3.12-slim
 WORKDIR /app
 COPY --from=builder /install /usr/local
 COPY app/ ./app/
+COPY frontend/ ./frontend/
 COPY alembic/ ./alembic/
 COPY alembic.ini .
 COPY entrypoint.sh .

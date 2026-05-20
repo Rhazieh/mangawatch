@@ -10,6 +10,7 @@ apscheduler==3.10.4
 pydantic-settings==2.7.1
 pydantic[email]==2.10.6
 beautifulsoup4==4.12.3
+aiofiles==24.1.0
 
 # dev / ci
 ruff==0.9.6

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MangaWatch — Sign In</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f0f13;
+      color: #e2e2e9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #1a1a23;
+      border: 1px solid #2a2a38;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #7c6af7;
+    }
+    .logo p { font-size: 0.85rem; color: #888; margin-top: 0.25rem; }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #2a2a38;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      flex: 1;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 0.9rem;
+      padding: 0.6rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab.active { color: #7c6af7; border-bottom-color: #7c6af7; }
+
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.8rem; color: #aaa; margin-bottom: 0.35rem; }
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      background: #12121a;
+      border: 1px solid #2a2a38;
+      border-radius: 8px;
+      color: #e2e2e9;
+      font-size: 0.95rem;
+      padding: 0.6rem 0.75rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: #7c6af7; }
+
+    .btn {
+      width: 100%;
+      background: #7c6af7;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.7rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #6a59e0; }
+    .btn:disabled { background: #444; cursor: not-allowed; }
+
+    .error {
+      background: #3a1a1a;
+      border: 1px solid #7a2a2a;
+      border-radius: 8px;
+      color: #f87171;
+      font-size: 0.85rem;
+      padding: 0.6rem 0.75rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+    .success {
+      background: #1a3a2a;
+      border: 1px solid #2a7a4a;
+      border-radius: 8px;
+      color: #4ade80;
+      font-size: 0.85rem;
+      padding: 0.6rem 0.75rem;
+      margin-top: 0.75rem;
+      display: none;
+    }
+
+    #register-panel { display: none; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <h1>MangaWatch</h1>
+    <p>Track new chapters automatically</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+    <button class="tab" id="tab-register" onclick="switchTab('register')">Create Account</button>
+  </div>
+
+  <!-- Login -->
+  <div id="login-panel">
+    <div class="form-group">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="error" id="login-error"></div>
+  </div>
+
+  <!-- Register -->
+  <div id="register-panel">
+    <div class="form-group">
+      <label for="reg-email">Email</label>
+      <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label for="reg-confirm">Confirm Password</label>
+      <input type="password" id="reg-confirm" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <button class="btn" id="reg-btn" onclick="doRegister()">Create Account</button>
+    <div class="error" id="reg-error"></div>
+    <div class="success" id="reg-success"></div>
+  </div>
+</div>
+
+<script>
+  // Redirect if already logged in
+  if (localStorage.getItem('mw_token')) {
+    window.location.href = '/ui/';
+  }
+
+  function switchTab(tab) {
+    document.getElementById('login-panel').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('register-panel').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errEl = document.getElementById('login-error');
+    const btn = document.getElementById('login-btn');
+
+    errEl.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Login failed');
+      localStorage.setItem('mw_token', data.access_token);
+      window.location.href = '/ui/';
+    } catch (e) {
+      errEl.textContent = e.message;
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  }
+
+  async function doRegister() {
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    const errEl = document.getElementById('reg-error');
+    const okEl = document.getElementById('reg-success');
+    const btn = document.getElementById('reg-btn');
+
+    errEl.style.display = 'none';
+    okEl.style.display = 'none';
+
+    if (password !== confirm) {
+      errEl.textContent = 'Passwords do not match';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Creating account…';
+
+    try {
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Registration failed');
+      okEl.textContent = 'Account created! Signing you in…';
+      okEl.style.display = 'block';
+      // Auto-login after registration
+      const loginRes = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const loginData = await loginRes.json();
+      if (loginRes.ok) {
+        localStorage.setItem('mw_token', loginData.access_token);
+        window.location.href = '/ui/';
+      }
+    } catch (e) {
+      errEl.textContent = e.message;
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Create Account';
+    }
+  }
+
+  // Allow Enter key to submit
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    const loginVisible = document.getElementById('login-panel').style.display !== 'none';
+    if (loginVisible) doLogin(); else doRegister();
+  });
+</script>
+</body>
+</html>

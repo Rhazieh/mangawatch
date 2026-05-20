@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MangaWatch</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f0f13;
+      color: #e2e2e9;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a1a23;
+      border-bottom: 1px solid #2a2a38;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.5rem;
+    }
+    header h1 { font-size: 1.15rem; font-weight: 700; color: #7c6af7; }
+    .logout-btn {
+      background: none;
+      border: 1px solid #3a3a50;
+      border-radius: 6px;
+      color: #aaa;
+      font-size: 0.8rem;
+      padding: 0.35rem 0.75rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .logout-btn:hover { color: #e2e2e9; border-color: #666; }
+
+    /* ── Layout ── */
+    main {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+    }
+    @media (max-width: 720px) {
+      main { grid-template-columns: 1fr; }
+    }
+
+    /* ── Panels ── */
+    .panel {
+      background: #1a1a23;
+      border: 1px solid #2a2a38;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #2a2a38;
+    }
+    .panel-header h2 { font-size: 0.95rem; font-weight: 600; }
+    .badge {
+      background: #7c6af7;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      min-width: 1.4em;
+      padding: 0.15em 0.5em;
+      text-align: center;
+    }
+    .panel-body { padding: 1.25rem; }
+
+    /* ── Subscribe form ── */
+    .subscribe-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .subscribe-form input {
+      flex: 1;
+      background: #12121a;
+      border: 1px solid #2a2a38;
+      border-radius: 8px;
+      color: #e2e2e9;
+      font-size: 0.85rem;
+      padding: 0.55rem 0.75rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .subscribe-form input:focus { border-color: #7c6af7; }
+    .subscribe-form input::placeholder { color: #555; }
+    .btn-primary {
+      background: #7c6af7;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.55rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #6a59e0; }
+    .btn-primary:disabled { background: #444; cursor: not-allowed; }
+
+    /* ── Lists ── */
+    .list-empty {
+      color: #555;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    /* Subscription item */
+    .sub-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #22222e;
+    }
+    .sub-item:last-child { border-bottom: none; }
+    .sub-info { flex: 1; min-width: 0; }
+    .sub-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sub-url {
+      font-size: 0.75rem;
+      color: #666;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 0.15rem;
+    }
+    .sub-source {
+      font-size: 0.7rem;
+      color: #7c6af7;
+      background: #1e1a38;
+      border-radius: 4px;
+      padding: 0.1em 0.45em;
+      margin-top: 0.25rem;
+      display: inline-block;
+    }
+    .btn-unsub {
+      background: none;
+      border: 1px solid #3a2a2a;
+      border-radius: 6px;
+      color: #f87171;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .btn-unsub:hover { background: #3a1a1a; }
+
+    /* Notification item */
+    .notif-item {
+      padding: 0.85rem 0;
+      border-bottom: 1px solid #22222e;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread { border-left: 3px solid #7c6af7; padding-left: 0.75rem; }
+    .notif-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .notif-series {
+      font-size: 0.8rem;
+      color: #aaa;
+      font-weight: 500;
+    }
+    .notif-chapter {
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+    .notif-chapter a {
+      color: #7c6af7;
+      text-decoration: none;
+    }
+    .notif-chapter a:hover { text-decoration: underline; }
+    .notif-time {
+      font-size: 0.72rem;
+      color: #555;
+      margin-top: 0.3rem;
+    }
+    .btn-read {
+      background: none;
+      border: 1px solid #2a2a38;
+      border-radius: 6px;
+      color: #888;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-read:hover { color: #e2e2e9; border-color: #666; }
+
+    /* ── Inline messages ── */
+    .msg {
+      font-size: 0.8rem;
+      border-radius: 6px;
+      padding: 0.5rem 0.7rem;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+    .msg.error { background: #3a1a1a; color: #f87171; }
+    .msg.success { background: #1a3a2a; color: #4ade80; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MangaWatch</h1>
+  <button class="logout-btn" onclick="logout()">Sign out</button>
+</header>
+
+<main>
+  <!-- Subscriptions panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Subscriptions</h2>
+      <span class="badge" id="sub-count">0</span>
+    </div>
+    <div class="panel-body">
+      <div class="subscribe-form">
+        <input type="url" id="sub-url" placeholder="MangaDex / ManwhaClan / KunManga URL">
+        <button class="btn-primary" id="sub-btn" onclick="doSubscribe()">Add</button>
+      </div>
+      <div class="msg error" id="sub-error"></div>
+      <div class="msg success" id="sub-ok"></div>
+      <div id="sub-list"><div class="list-empty">No subscriptions yet</div></div>
+    </div>
+  </div>
+
+  <!-- Notifications panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Notifications</h2>
+      <span class="badge" id="notif-unread-badge" style="display:none"></span>
+    </div>
+    <div class="panel-body">
+      <div id="notif-list"><div class="list-empty">No notifications yet</div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const TOKEN_KEY = 'mw_token';
+
+  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+
+  function authHeaders() {
+    return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
+  }
+
+  function logout() {
+    localStorage.removeItem(TOKEN_KEY);
+    window.location.href = '/ui/login.html';
+  }
+
+  // Guard: redirect to login if not authenticated
+  if (!getToken()) {
+    window.location.href = '/ui/login.html';
+  }
+
+  function timeAgo(isoString) {
+    const diff = (Date.now() - new Date(isoString).getTime()) / 1000;
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
+  // ── Subscriptions ────────────────────────────────────────────────────────
+
+  let subscriptions = [];
+
+  async function loadSubscriptions() {
+    try {
+      const res = await fetch('/subscriptions', { headers: authHeaders() });
+      if (res.status === 401) { logout(); return; }
+      subscriptions = await res.json();
+      renderSubscriptions();
+    } catch (e) {
+      console.error('Failed to load subscriptions', e);
+    }
+  }
+
+  function renderSubscriptions() {
+    const el = document.getElementById('sub-list');
+    document.getElementById('sub-count').textContent = subscriptions.length;
+
+    if (subscriptions.length === 0) {
+      el.innerHTML = '<div class="list-empty">No subscriptions yet</div>';
+      return;
+    }
+
+    el.innerHTML = subscriptions.map(s => {
+      const title = s.series_title || 'Unknown Series';
+      const source = s.source_type || '';
+      const shortUrl = s.source_url.replace(/^https?:\/\//, '');
+      return `
+        <div class="sub-item">
+          <div class="sub-info">
+            <div class="sub-title" title="${escHtml(s.source_url)}">${escHtml(title)}</div>
+            <div class="sub-url">${escHtml(shortUrl)}</div>
+            ${source ? `<span class="sub-source">${escHtml(source)}</span>` : ''}
+          </div>
+          <button class="btn-unsub" onclick="doUnsubscribe(${s.id})">Remove</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function doSubscribe() {
+    const url = document.getElementById('sub-url').value.trim();
+    const errEl = document.getElementById('sub-error');
+    const okEl = document.getElementById('sub-ok');
+    const btn = document.getElementById('sub-btn');
+
+    errEl.style.display = 'none';
+    okEl.style.display = 'none';
+
+    if (!url) { errEl.textContent = 'Please enter a URL'; errEl.style.display = 'block'; return; }
+
+    btn.disabled = true;
+    btn.textContent = '…';
+
+    try {
+      const res = await fetch('/subscriptions', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Subscribe failed');
+      document.getElementById('sub-url').value = '';
+      okEl.textContent = 'Subscribed!';
+      okEl.style.display = 'block';
+      setTimeout(() => { okEl.style.display = 'none'; }, 2500);
+      await loadSubscriptions();
+    } catch (e) {
+      errEl.textContent = e.message;
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Add';
+    }
+  }
+
+  async function doUnsubscribe(seriesId) {
+    if (!confirm('Remove this subscription?')) return;
+    try {
+      const res = await fetch(`/subscriptions/${seriesId}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+      if (res.status === 401) { logout(); return; }
+      if (!res.ok) throw new Error('Unsubscribe failed');
+      await loadSubscriptions();
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  // ── Notifications ────────────────────────────────────────────────────────
+
+  let notifications = [];
+
+  async function loadNotifications() {
+    try {
+      const res = await fetch('/notifications', { headers: authHeaders() });
+      if (res.status === 401) { logout(); return; }
+      notifications = await res.json();
+      renderNotifications();
+    } catch (e) {
+      console.error('Failed to load notifications', e);
+    }
+  }
+
+  function renderNotifications() {
+    const el = document.getElementById('notif-list');
+    const badge = document.getElementById('notif-unread-badge');
+    const unread = notifications.filter(n => !n.read).length;
+
+    if (unread > 0) {
+      badge.textContent = unread;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    if (notifications.length === 0) {
+      el.innerHTML = '<div class="list-empty">No notifications yet</div>';
+      return;
+    }
+
+    el.innerHTML = notifications.map(n => {
+      const seriesTitle = n.series_title || 'Unknown Series';
+      const chapterLabel = n.chapter_title || 'New Chapter';
+      const ts = n.created_at ? timeAgo(n.created_at) : '';
+      const unreadClass = n.read ? '' : ' unread';
+      const readBtn = n.read
+        ? ''
+        : `<button class="btn-read" onclick="doMarkRead(${n.id})">Mark read</button>`;
+
+      return `
+        <div class="notif-item${unreadClass}" id="notif-${n.id}">
+          <div class="notif-top">
+            <div>
+              <div class="notif-series">${escHtml(seriesTitle)}</div>
+              <div class="notif-chapter">
+                ${n.chapter_url
+                  ? `<a href="${escHtml(n.chapter_url)}" target="_blank" rel="noopener">${escHtml(chapterLabel)}</a>`
+                  : escHtml(chapterLabel)}
+              </div>
+              ${ts ? `<div class="notif-time">${ts}</div>` : ''}
+            </div>
+            ${readBtn}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function doMarkRead(notifId) {
+    try {
+      const res = await fetch(`/notifications/${notifId}/read`, {
+        method: 'PATCH',
+        headers: authHeaders(),
+      });
+      if (res.status === 401) { logout(); return; }
+      if (!res.ok) throw new Error('Failed to mark as read');
+      const idx = notifications.findIndex(n => n.id === notifId);
+      if (idx !== -1) notifications[idx].read = true;
+      renderNotifications();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────────────────
+
+  loadSubscriptions();
+  loadNotifications();
+
+  // Allow Enter key in subscribe input
+  document.getElementById('sub-url').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSubscribe();
+  });
+</script>
+</body>
+</html>
