@@ -6,7 +6,7 @@ import httpx
 from app.services.chapter import ChapterInfo
 
 _MANGADEX_URL = "https://mangadex.org/title/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-_MANWHACLAN_URL = "https://manwhaclan.com/manga/solo-leveling/"
+_MANWHACLAN_URL = "https://manhwaclan.com/manga/solo-leveling/"
 _KUNMANGA_URL = "https://kunmanga.com/manga/one-piece/"
 
 _CHAPTER = ChapterInfo(id="ch-1", title="The Beginning", chapter_number="1",
@@ -28,8 +28,8 @@ def test_dispatcher_routes_mangadex():
 def test_dispatcher_routes_manwhaclan():
     from app.services import sources
 
-    with patch("app.services.sources.manwhaclan.get_latest_chapter", return_value=_CHAPTER) as mock:
-        result = sources.get_latest_chapter(_MANWHACLAN_URL, "manwhaclan")
+    with patch("app.services.sources.manhwaclan.get_latest_chapter", return_value=_CHAPTER) as mock:
+        result = sources.get_latest_chapter(_MANWHACLAN_URL, "manhwaclan")
 
     mock.assert_called_once_with(_MANWHACLAN_URL)
     assert result == _CHAPTER
@@ -74,10 +74,10 @@ def _mock_httpx_get(html: str):
 
 
 def test_manwhaclan_returns_chapter_info_from_html():
-    from app.services import manwhaclan
+    from app.services import manhwaclan
 
-    with patch("app.services.manwhaclan.httpx.get", _mock_httpx_get(_MANWHACLAN_HTML)):
-        result = manwhaclan.get_latest_chapter(_MANWHACLAN_URL)
+    with patch("app.services.manhwaclan.httpx.get", _mock_httpx_get(_MANWHACLAN_HTML)):
+        result = manhwaclan.get_latest_chapter(_MANWHACLAN_URL)
 
     assert result is not None
     assert result.chapter_number == "200"
@@ -86,20 +86,20 @@ def test_manwhaclan_returns_chapter_info_from_html():
 
 
 def test_manwhaclan_returns_none_when_no_chapters():
-    from app.services import manwhaclan
+    from app.services import manhwaclan
 
     empty_html = "<html><body><ul class='chapter-list'></ul></body></html>"
-    with patch("app.services.manwhaclan.httpx.get", _mock_httpx_get(empty_html)):
-        result = manwhaclan.get_latest_chapter(_MANWHACLAN_URL)
+    with patch("app.services.manhwaclan.httpx.get", _mock_httpx_get(empty_html)):
+        result = manhwaclan.get_latest_chapter(_MANWHACLAN_URL)
 
     assert result is None
 
 
 def test_manwhaclan_returns_none_on_http_error():
-    from app.services import manwhaclan
+    from app.services import manhwaclan
 
-    with patch("app.services.manwhaclan.httpx.get", side_effect=httpx.ConnectError("timeout")):
-        result = manwhaclan.get_latest_chapter(_MANWHACLAN_URL)
+    with patch("app.services.manhwaclan.httpx.get", side_effect=httpx.ConnectError("timeout")):
+        result = manhwaclan.get_latest_chapter(_MANWHACLAN_URL)
 
     assert result is None
 
@@ -166,7 +166,7 @@ def test_poller_uses_dispatcher_not_mangadex_directly(client):
     user = User(email="reader2@example.com", hashed_password=hash_password("x"))
     db.add(user)
     db.flush()
-    series = Series(source_url=_MANWHACLAN_URL, source_type="manwhaclan",
+    series = Series(source_url=_MANWHACLAN_URL, source_type="manhwaclan",
                     external_id="solo-leveling")
     db.add(series)
     db.flush()
@@ -193,5 +193,5 @@ def test_scheduler_registers_scrape_jobs():
     job_ids = {job.id for job in scheduler._scheduler.get_jobs()}
     scheduler.stop()
 
-    assert "manwhaclan_poll" in job_ids
+    assert "manhwaclan_poll" in job_ids
     assert "kunmanga_poll" in job_ids

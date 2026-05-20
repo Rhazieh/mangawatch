@@ -22,7 +22,7 @@ def _parse(series_url: str, html: str) -> ChapterInfo | None:
         return None
     first = items[0]
     href = first.get("href", "")
-    url = href if href.startswith("http") else f"https://manwhaclan.com{href}"
+    url = href if href.startswith("http") else f"https://manhwaclan.com{href}"
     _, external_id = parse_source_url(series_url)
     chapter_number = _extract_chapter_number(href)
     return ChapterInfo(

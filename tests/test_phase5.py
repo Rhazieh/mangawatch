@@ -8,7 +8,7 @@ from app.services.auth import hash_password
 from tests.conftest import TestingSessionLocal
 from tests.test_subscriptions import MANGADEX_URL, _auth_headers
 
-MANWHACLAN_URL = "https://manwhaclan.com/manga/solo-leveling/"
+MANWHACLAN_URL = "https://manhwaclan.com/manga/solo-leveling/"
 KUNMANGA_URL = "https://kunmanga.com/manga/one-piece/"
 
 

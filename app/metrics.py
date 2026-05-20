@@ -13,7 +13,7 @@ new_chapters_total = Counter(
 )
 
 # Pre-initialize known label combinations so they appear at 0 before the first poll
-for _source in ("mangadex", "manwhaclan", "kunmanga"):
+for _source in ("mangadex", "manhwaclan", "kunmanga"):
     poll_total.labels(source=_source, status="success")
     poll_total.labels(source=_source, status="error")
     new_chapters_total.labels(source=_source)

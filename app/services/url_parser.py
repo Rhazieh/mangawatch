@@ -2,7 +2,7 @@ import re
 
 _PATTERNS = {
     "mangadex": re.compile(r"mangadex\.org/title/([a-f0-9-]{36})"),
-    "manwhaclan": re.compile(r"manwhaclan\.com/manga/([^/?#]+)"),
+    "manhwaclan": re.compile(r"manhwaclan\.com/manga/([^/?#]+)"),
     "kunmanga": re.compile(r"kunmanga\.com/manga/([^/?#]+)"),
 }
 

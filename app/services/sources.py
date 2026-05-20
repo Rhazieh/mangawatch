@@ -1,4 +1,4 @@
-from app.services import kunmanga, mangadex, manwhaclan
+from app.services import kunmanga, mangadex, manhwaclan
 from app.services.chapter import ChapterInfo
 from app.services.url_parser import parse_source_url
 
@@ -6,7 +6,7 @@ __all__ = ["parse_source_url", "get_latest_chapter", "get_series_title"]
 
 _MODULES: dict = {
     "mangadex": mangadex,
-    "manwhaclan": manwhaclan,
+    "manhwaclan": manhwaclan,
     "kunmanga": kunmanga,
 }
 

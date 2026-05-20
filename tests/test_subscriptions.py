@@ -1,5 +1,5 @@
 MANGADEX_URL = "https://mangadex.org/title/a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-MANWHACLAN_URL = "https://manwhaclan.com/manga/the-beginning-after-the-end/"
+MANWHACLAN_URL = "https://manhwaclan.com/manga/the-beginning-after-the-end/"
 KUNMANGA_URL = "https://kunmanga.com/manga/solo-leveling/"
 
 

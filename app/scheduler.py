@@ -29,7 +29,7 @@ def start():
         id="mangadex_poll",
         replace_existing=True,
     )
-    for source_type in ("manwhaclan", "kunmanga"):
+    for source_type in ("manhwaclan", "kunmanga"):
         _scheduler.add_job(
             _make_poll_job(source_type),
             "interval",
