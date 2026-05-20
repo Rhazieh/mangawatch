@@ -17,6 +17,14 @@ class Settings(BaseSettings):
     poll_interval_mangadex: int = 1800  # seconds — 30 min per ADR-0001
     poll_interval_scrape: int = 7200    # seconds — 2 hr for scrape sources
 
+    @field_validator("database_url")
+    @classmethod
+    def fix_postgres_scheme(cls, v: str) -> str:
+        # Fly.io (and Heroku) set postgres:// but SQLAlchemy 2.0 requires postgresql://
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql://", 1)
+        return v
+
     @field_validator("jwt_secret")
     @classmethod
     def jwt_secret_not_empty(cls, v: str) -> str:
