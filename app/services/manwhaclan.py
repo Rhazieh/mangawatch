@@ -33,6 +33,18 @@ def _parse(series_url: str, html: str) -> ChapterInfo | None:
     )
 
 
+def get_series_title(series_url: str) -> str | None:
+    try:
+        resp = httpx.get(series_url, timeout=10, follow_redirects=True,
+                         headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        tag = soup.select_one("h1.entry-title") or soup.find("h1")
+        return tag.get_text(strip=True) if tag else None
+    except Exception:
+        return None
+
+
 def _extract_chapter_number(href: str) -> str | None:
     import re
     m = re.search(r"chapter-(\d+(?:\.\d+)?)", href)

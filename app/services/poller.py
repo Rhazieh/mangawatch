@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.metrics import new_chapters_total, poll_total
 from app.models.notification import Notification
 from app.models.series import Series, Subscription
-from app.services import sources
+from app.services import discord, sources
 
 
 def poll_series(series: Series, db: Session) -> bool:
@@ -13,6 +13,7 @@ def poll_series(series: Series, db: Session) -> bool:
     latest = sources.get_latest_chapter(series.source_url, series.source_type)
     if latest is None:
         poll_total.labels(source=series.source_type, status="error").inc()
+        discord.send_alert(f"[{series.source_type}] poll error for {series.source_url}")
         return False
     if latest.id == series.last_chapter_id:
         poll_total.labels(source=series.source_type, status="success").inc()
@@ -35,4 +36,6 @@ def poll_series(series: Series, db: Session) -> bool:
 
     poll_total.labels(source=series.source_type, status="success").inc()
     new_chapters_total.labels(source=series.source_type).inc()
+    label = latest.title or latest.chapter_number
+    discord.send_alert(f"[{series.source_type}] new chapter: {label} — {latest.url}")
     return True

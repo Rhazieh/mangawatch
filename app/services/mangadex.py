@@ -32,3 +32,14 @@ def get_latest_chapter(series_url: str) -> ChapterInfo | None:
         )
     except Exception:
         return None
+
+
+def get_series_title(series_url: str) -> str | None:
+    try:
+        _, manga_id = parse_source_url(series_url)
+        resp = httpx.get(f"{_API_BASE}/manga/{manga_id}", timeout=10)
+        resp.raise_for_status()
+        titles = resp.json()["data"]["attributes"]["title"]
+        return titles.get("en") or next(iter(titles.values()), None)
+    except Exception:
+        return None
