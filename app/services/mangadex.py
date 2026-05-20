@@ -1,7 +1,7 @@
 import httpx
 
 from app.services.chapter import ChapterInfo
-from app.services.sources import parse_source_url
+from app.services.url_parser import parse_source_url
 
 _API_BASE = "https://api.mangadex.org"
 

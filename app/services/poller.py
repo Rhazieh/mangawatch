@@ -5,12 +5,12 @@ from sqlalchemy.orm import Session
 from app.metrics import new_chapters_total, poll_total
 from app.models.notification import Notification
 from app.models.series import Series, Subscription
-from app.services.mangadex import get_latest_chapter
+from app.services import sources
 
 
 def poll_series(series: Series, db: Session) -> bool:
     """Poll one Series for a new chapter. Returns True if a new chapter was found."""
-    latest = get_latest_chapter(series.source_url)
+    latest = sources.get_latest_chapter(series.source_url, series.source_type)
     if latest is None:
         poll_total.labels(source=series.source_type, status="error").inc()
         return False

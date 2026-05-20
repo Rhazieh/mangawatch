@@ -6,7 +6,7 @@ from app.dependencies import get_current_user
 from app.models.series import Series, Subscription
 from app.models.user import User
 from app.schemas.subscriptions import SubscribeRequest
-from app.services.sources import parse_source_url
+from app.services.url_parser import parse_source_url
 
 router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])
 

@@ -1,15 +1,18 @@
-import re
+from app.services import kunmanga, mangadex, manwhaclan
+from app.services.chapter import ChapterInfo
+from app.services.url_parser import parse_source_url
 
-_PATTERNS = {
-    "mangadex": re.compile(r"mangadex\.org/title/([a-f0-9-]{36})"),
-    "manwhaclan": re.compile(r"manwhaclan\.com/manga/([^/?#]+)"),
-    "kunmanga": re.compile(r"kunmanga\.com/manga/([^/?#]+)"),
+__all__ = ["parse_source_url", "get_latest_chapter"]
+
+_MODULES: dict = {
+    "mangadex": mangadex,
+    "manwhaclan": manwhaclan,
+    "kunmanga": kunmanga,
 }
 
 
-def parse_source_url(url: str) -> tuple[str, str]:
-    """Return (source_type, external_id) or raise ValueError for unsupported URLs."""
-    for source_type, pattern in _PATTERNS.items():
-        if m := pattern.search(url):
-            return source_type, m.group(1)
-    raise ValueError(f"Unsupported source URL: {url}")
+def get_latest_chapter(source_url: str, source_type: str) -> ChapterInfo | None:
+    module = _MODULES.get(source_type)
+    if module is None:
+        return None
+    return module.get_latest_chapter(source_url)

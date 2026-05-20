@@ -20,7 +20,7 @@ def test_poll_counter_increments_after_successful_poll(client):
 
     chapter = ChapterInfo(id="c1", title="Ch 1", chapter_number="1",
                           url="https://mangadex.org/chapter/c1")
-    with patch("app.services.poller.get_latest_chapter", return_value=chapter):
+    with patch("app.services.poller.sources.get_latest_chapter", return_value=chapter):
         poll_series(series, db)
 
     db.close()

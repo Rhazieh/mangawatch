@@ -89,7 +89,7 @@ def test_poller_creates_notifications_for_subscribers(client):
     db = TestingSessionLocal()
     series, user = _make_series_with_subscriber(db)
 
-    with patch("app.services.poller.get_latest_chapter", return_value=_chapter_info()):
+    with patch("app.services.poller.sources.get_latest_chapter", return_value=_chapter_info()):
         poll_series(series, db)
 
     notifications = db.query(Notification).filter(Notification.user_id == user.id).all()
@@ -113,7 +113,7 @@ def test_poller_does_nothing_when_source_returns_none(client):
     db = TestingSessionLocal()
     series, user = _make_series_with_subscriber(db)
 
-    with patch("app.services.poller.get_latest_chapter", return_value=None):
+    with patch("app.services.poller.sources.get_latest_chapter", return_value=None):
         result = poll_series(series, db)
 
     count = db.query(Notification).filter(Notification.user_id == user.id).count()
@@ -132,7 +132,7 @@ def test_poller_skips_when_chapter_unchanged(client):
     series.last_chapter_id = "chapter-uuid-001"
     db.commit()
 
-    with patch("app.services.poller.get_latest_chapter", return_value=_chapter_info()):
+    with patch("app.services.poller.sources.get_latest_chapter", return_value=_chapter_info()):
         poll_series(series, db)
 
     count = db.query(Notification).filter(Notification.user_id == user.id).count()
