@@ -1,2 +1,14 @@
 fastapi==0.115.12
 uvicorn[standard]==0.34.2
+sqlalchemy==2.0.40
+alembic==1.14.1
+psycopg2-binary==2.9.10
+bcrypt==4.3.0
+PyJWT==2.10.1
+pydantic-settings==2.7.1
+pydantic[email]==2.10.6
+
+# dev / ci
+ruff==0.9.6
+pytest==8.3.5
+httpx==0.28.1
